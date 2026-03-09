@@ -33,7 +33,7 @@ jobs:
           path: dist/ # Замените на вашу папку со сборкой (например, build/ для React)
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
