@@ -37,6 +37,176 @@ import '../styles/global.css';
       </div>
     </section>
 
+    <section id="projects">
+      <div class="container">
+        <h2>Проекты</h2>
+        <p class="section-intro">
+          Open source и пет-проекты: библиотеки, утилиты и приложения.
+        </p>
+        <div class="projects-grid">
+          {
+            [
+              {
+                name: 'swagger-typescript-api',
+                site: 'https://github.com/acacode/swagger-typescript-api',
+                siteLabel: 'github.com/acacode/swagger-typescript-api',
+                description: 'Генерация API-клиента (Fetch/Axios) из OpenAPI спецификации',
+                domain: 'github.com',
+              },
+              {
+                name: 'Time Tracker App',
+                site: 'https://js2me.github.io/time-tracker-app/',
+                siteLabel: 'js2me.github.io/time-tracker-app',
+                description: 'Тайм-трекер для работы и учёта времени',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/time-tracker-app/logo.png',
+              },
+              {
+                name: 'frontend-quiz',
+                site: 'https://github.com/js2me/frontend-quiz',
+                siteLabel: 'github.com/js2me/frontend-quiz',
+                description: 'Квиз по фронтенду без бэкенда',
+                domain: 'github.com',
+              },
+              {
+                name: 'mobx-web-api',
+                site: 'https://js2me.github.io/mobx-web-api/',
+                siteLabel: 'js2me.github.io/mobx-web-api',
+                description: 'Реактивные браузерные API для MobX: Network, geolocation, media queries',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-web-api/logo.png',
+              },
+              {
+                name: 'mobx-tanstack-query',
+                site: 'https://js2me.github.io/mobx-tanstack-query/',
+                siteLabel: 'js2me.github.io/mobx-tanstack-query',
+                description: 'MobX-обёртки для TanStack Query (Core)',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-tanstack-query/logo.png',
+              },
+              {
+                name: 'mobx-view-model',
+                site: 'https://js2me.github.io/mobx-view-model',
+                siteLabel: 'js2me.github.io/mobx-view-model',
+                description: 'Чистый MVVM для React + MobX',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-view-model/logo.png',
+              },
+              {
+                name: 'mobx-tanstack-query-api',
+                site: 'https://js2me.github.io/mobx-tanstack-query-api/',
+                siteLabel: 'js2me.github.io/mobx-tanstack-query-api',
+                description: 'OpenAPI/Swagger codegen и интеграция эндпоинтов с mobx-tanstack-query',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-tanstack-query-api/logo.png',
+              },
+              {
+                name: 'mobx-view-model-devtools',
+                site: 'https://github.com/js2me/mobx-view-model-devtools',
+                siteLabel: 'github.com/js2me/mobx-view-model-devtools',
+                description: 'Devtools для пакета mobx-view-model',
+                domain: 'github.com',
+              },
+              {
+                name: 'react-simple-loadable',
+                site: 'https://github.com/js2me/react-simple-loadable',
+                siteLabel: 'github.com/js2me/react-simple-loadable',
+                description: 'Простой React Loadable (HOC) для ленивой загрузки',
+                domain: 'github.com',
+              },
+              {
+                name: 'mobx-react-hook-form',
+                site: 'https://github.com/js2me/mobx-react-hook-form',
+                siteLabel: 'github.com/js2me/mobx-react-hook-form',
+                description: 'Обёртка react-hook-form для MobX',
+                domain: 'github.com',
+              },
+              {
+                name: 'mobx-swiss-knife',
+                site: 'https://js2me.github.io/mobx-swiss-knife/',
+                siteLabel: 'js2me.github.io/mobx-swiss-knife',
+                description: 'Набор утилит с возможностями MobX',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-swiss-knife/logo.png',
+              },
+              {
+                name: 'mobx-location-history',
+                site: 'https://js2me.github.io/mobx-location-history/',
+                siteLabel: 'js2me.github.io/mobx-location-history',
+                description: 'Пакет history (как в Remix) и MobX-утилиты для роутинга',
+                domain: 'js2me.github.io',
+                logo: 'https://js2me.github.io/mobx-location-history/logo.png',
+              },
+              {
+                name: 'gitlab-activity-analyzer',
+                site: 'https://github.com/js2me/gitlab-activity-analyzer',
+                siteLabel: 'github.com/js2me/gitlab-activity-analyzer',
+                description: 'Просмотр активностей в GitLab',
+                domain: 'github.com',
+              },
+              {
+                name: 'yummies',
+                site: 'https://github.com/js2me/yummies',
+                siteLabel: 'github.com/js2me/yummies',
+                description: 'Набор утилит для JavaScript: async, cookie, date-time, media, text и др.',
+                domain: 'github.com',
+              },
+              {
+                name: 'react-simple-error-boundary',
+                site: 'https://github.com/js2me/react-simple-error-boundary',
+                siteLabel: 'github.com/js2me/react-simple-error-boundary',
+                description: 'Простой ErrorBoundary для React (компонент и HOC)',
+                domain: 'github.com',
+              },
+              {
+                name: 'zod-i18n-better-ru',
+                site: 'https://github.com/js2me/zod-i18n-better-ru',
+                siteLabel: 'github.com/js2me/zod-i18n-better-ru',
+                description: 'Улучшенная русская локализация для zod v4',
+                domain: 'github.com',
+              },
+              {
+                name: 'html-intercetor',
+                site: 'https://github.com/js2me/html-intercetor',
+                siteLabel: 'github.com/js2me/html-intercetor',
+                description: 'Chrome-расширение — перехватчик HTML',
+                domain: 'github.com',
+                logo: 'https://raw.githubusercontent.com/js2me/html-intercetor/main/icon32.png',
+              },
+              {
+                name: 'http-status-code-types',
+                site: 'https://github.com/js2me/http-status-code-types',
+                siteLabel: 'github.com/js2me/http-status-code-types',
+                description: 'TypeScript-типы для HTTP-кодов ответа',
+                domain: 'github.com',
+              },
+              {
+                name: 'mobx-wouter',
+                site: 'https://github.com/js2me/mobx-wouter',
+                siteLabel: 'github.com/js2me/mobx-wouter',
+                description: 'Интеграция MobX с роутером Wouter',
+                domain: 'github.com',
+              },
+            ].map((p) => (
+              <a href={p.site} class="project-card card" target="_blank" rel="noopener noreferrer">
+                <img
+                  class="project-logo"
+                  src={p.logo ?? `https://www.google.com/s2/favicons?domain=${p.domain}&sz=48`}
+                  alt=""
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                />
+                <h3 class="project-name">{p.name}</h3>
+                <span class="project-site">{p.siteLabel}</span>
+                <p class="project-description">{p.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
     <section id="blog-preview">
       <div class="container">
         <h2>Последние посты</h2>
