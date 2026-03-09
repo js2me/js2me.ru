@@ -50,6 +50,14 @@ const imageURL = imagePath.startsWith('http') ? imagePath : new URL(imagePath, A
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script is:inline>
+      fetch('https://unpkg.com/mobx-view-model-devtools/auto.global.js').then(async (response) => {
+        const script = await response.text();
+        const scriptElement = document.createElement('script');
+        scriptElement.innerHTML = script;
+        document.head.appendChild(scriptElement);
+      });
+    </script>
   </head>
   <body>
     <slot />
