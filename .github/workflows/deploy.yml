@@ -51,6 +51,12 @@ jobs:
       - name: Add Server to Known Hosts
         run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
+      # Временный шаг для отладки SSH — удали после успешного деплоя
+      - name: Debug SSH connection
+        run: |
+          echo "Trying SSH with verbose output..."
+          ssh -v -o BatchMode=yes ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo OK" || true
+
       - name: Zero-Downtime Deploy script
         run: |
           RELEASE_NAME=$(date +%Y%m%d%H%M%S)
