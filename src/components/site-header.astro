@@ -1,0 +1,58 @@
+---
+interface Props {
+  scrolled?: boolean;
+}
+const { scrolled = false } = Astro.props;
+---
+<header class:list={['site-header', scrolled && 'scrolled']} id="header">
+  <div class="container">
+    <a href="/" class="site-logo">js2me</a>
+    <button type="button" class="burger-btn" id="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-hidden="true">
+      <ul>
+        <li><a href="/#about">Обо мне</a></li>
+        <li><a href="/blog">Блог</a></li>
+        <li><a href="/#contacts">Контакты</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<script>
+  const btn = document.getElementById('burger-btn');
+  const nav = document.getElementById('site-nav');
+  const header = document.getElementById('header');
+
+  function closeMenu() {
+    btn?.setAttribute('aria-expanded', 'false');
+    btn?.setAttribute('aria-label', 'Открыть меню');
+    nav?.setAttribute('aria-hidden', 'true');
+    header?.classList.remove('menu-open');
+    document.body.style.overflow = '';
+  }
+
+  function openMenu() {
+    btn?.setAttribute('aria-expanded', 'true');
+    btn?.setAttribute('aria-label', 'Закрыть меню');
+    nav?.setAttribute('aria-hidden', 'false');
+    header?.classList.add('menu-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function toggleMenu() {
+    const isOpen = header?.classList.contains('menu-open');
+    if (isOpen) closeMenu();
+    else openMenu();
+  }
+
+  btn?.addEventListener('click', toggleMenu);
+  nav?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+</script>

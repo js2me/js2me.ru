@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/layout.astro';
+import Canvas3dBackground from '../components/canvas-3d-background.astro';
+import SiteHeader from '../components/site-header.astro';
+import '../styles/global.css';
+---
+<Layout title="js2me — персональный сайт и блог" description="Персональный сайт и блог js2me. Разработка, технологии, заметки.">
+  <Canvas3dBackground />
+  <SiteHeader />
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>js2me — персональный сайт и блог</h1>
+        <p class="tagline">
+          Заметки о разработке, технологиях и всём, что интересно. Создаю digital-продукты и делюсь опытом.
+        </p>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="container">
+        <h2>Кто я</h2>
+        <p class="section-intro">
+          Меня зовут Сергей Волков, я разработчик и энтузиаст технологий. Пишу код, экспериментирую с инструментами и делюсь находками в блоге.
+        </p>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Frontend</h3>
+            <p>TypeScript, JavaScript, React, Astro, CSS. Современный стек и практики.</p>
+          </div>
+          <div class="card">
+            <h3>Блог</h3>
+            <p>Статьи, туториалы и заметки — в разделе <a href="/blog">Блог</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="blog-preview">
+      <div class="container">
+        <h2>Последние посты</h2>
+        <p class="section-intro">
+          Свежие записи из блога.
+        </p>
+        <div class="card-grid">
+          <a href="/blog/hello" class="card">
+            <h3>Первый пост</h3>
+            <p>Приветствие и начало ведения блога на Astro.</p>
+          </a>
+        </div>
+        <p><a href="/blog">Все посты →</a></p>
+      </div>
+    </section>
+
+    <section id="contacts">
+      <div class="container">
+        <h2>Контакты</h2>
+        <ul class="contact-list">
+          <li>Telegram: <a href="https://t.me/js2me" target="_blank" rel="noopener noreferrer">t.me/js2me</a></li>
+          <li>Почта: <a href="mailto:js2me@outlook.com">js2me@outlook.com</a></li>
+          <li>GitHub: <a href="https://github.com/js2me" target="_blank" rel="noopener noreferrer">github.com/js2me</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const header = document.getElementById('header');
+    if (header) {
+      const onScroll = () => {
+        header.classList.toggle('scrolled', window.scrollY > 50);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+  </script>
+</Layout>

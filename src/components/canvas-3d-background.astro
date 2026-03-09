@@ -1,0 +1,32 @@
+---
+---
+<div class="canvas-wrapper">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+</div>
+<script>
+  import { initCanvas3D, resizeCanvas3D, disposeCanvas3D } from './canvas-3d-background';
+
+  const canvas = document.getElementById('hero-canvas');
+  if (canvas instanceof HTMLCanvasElement) {
+    initCanvas3D(canvas);
+    const ro = new ResizeObserver(() => resizeCanvas3D(canvas));
+    ro.observe(canvas);
+    window.addEventListener('beforeunload', () => {
+      ro.disconnect();
+      disposeCanvas3D();
+    });
+  }
+</script>
+<style>
+  .canvas-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #000;
+  }
+  #hero-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>

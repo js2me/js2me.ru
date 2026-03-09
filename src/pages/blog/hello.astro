@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/layout.astro';
+import Canvas3dBackground from '../../components/canvas-3d-background.astro';
+import SiteHeader from '../../components/site-header.astro';
+import '../../styles/global.css';
+---
+<Layout title="Первый пост — js2me" description="Первый пост в блоге js2me.">
+  <Canvas3dBackground />
+  <SiteHeader scrolled />
+
+  <main style="padding-top: 6rem; padding-bottom: 4rem;">
+    <article class="container" style="max-width: 720px;">
+      <p style="margin-bottom: 1rem;"><a href="/blog">← Блог</a></p>
+      <h1 style="font-size: 2rem; margin-bottom: 1rem;">Первый пост</h1>
+      <p style="color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 2rem;">Привет, это первый пост в блоге.</p>
+      <div style="line-height: 1.8;">
+        <p>
+          Решил сделать персональный сайт на Astro, используя Three.js для фона в металлическом стиле с анимацией и отблесками.
+        </p>
+        <p>
+          Здесь будут появляться заметки о разработке, технологиях и всём, что покажется интересным. Также веду канал в Telegram: <a href="https://t.me/js2me_talks" target="_blank" rel="noopener noreferrer">@js2me_talks</a> — пишу про веб-разработку и делюсь полезным.
+        </p>
+        <p>
+          Добро пожаловать!
+        </p>
+      </div>
+    </article>
+  </main>
+</Layout>

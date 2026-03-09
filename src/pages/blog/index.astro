@@ -1,0 +1,23 @@
+---
+import Layout from '../../layouts/layout.astro';
+import Canvas3dBackground from '../../components/canvas-3d-background.astro';
+import SiteHeader from '../../components/site-header.astro';
+import '../../styles/global.css';
+---
+<Layout title="Блог — js2me" description="Блог js2me: статьи о разработке и технологиях.">
+  <Canvas3dBackground />
+  <SiteHeader scrolled />
+
+  <main style="padding-top: 6rem; padding-bottom: 4rem;">
+    <div class="container">
+      <h1 style="margin-bottom: 0.5rem;">Блог</h1>
+      <p class="section-intro" style="margin-bottom: 2rem;">Заметки и статьи</p>
+      <div class="card-grid">
+        <a href="/blog/hello" class="card">
+          <h3>Первый пост</h3>
+          <p>Приветствие и начало ведения блога на Astro.</p>
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>
