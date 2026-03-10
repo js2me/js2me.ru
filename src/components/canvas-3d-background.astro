@@ -2,10 +2,13 @@
   <canvas aria-hidden="true" data-hero-canvas></canvas>
 </div>
 <script>
-  import { initCanvas3D, resizeCanvas3D, disposeCanvas3D } from './canvas-3d-background';
+  import { initCanvas3D, resizeCanvas3D, disposeCanvas3D, setMousePosition, clearMousePosition } from './canvas-3d-background';
 
   let ro: ResizeObserver | null = null;
   let isInitialized = false;
+  let onMove: ((e: MouseEvent) => void) | null = null;
+  let onTouch: ((e: TouchEvent) => void) | null = null;
+  let onLeave: (() => void) | null = null;
 
   const setupCanvas = () => {
     if (isInitialized) return;
@@ -16,10 +19,20 @@
     canvas.classList.add('is-booting');
     initCanvas3D(canvas);
 
+    onMove = (e: MouseEvent) => setMousePosition(e.clientX, e.clientY);
+    onTouch = (e: TouchEvent) => {
+      if (e.touches.length > 0) setMousePosition(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    onLeave = () => clearMousePosition();
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('touchmove', onTouch, { passive: true });
+    window.addEventListener('mouseleave', onLeave);
+    document.addEventListener('touchcancel', onLeave);
+
     ro = new ResizeObserver(() => resizeCanvas3D(canvas));
     ro.observe(canvas);
 
-    // Даём three.js отрисовать первый кадр и плавно показываем canvas.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         canvas.classList.remove('is-booting');
@@ -33,6 +46,19 @@
   const cleanupCanvas = () => {
     if (!isInitialized) return;
 
+    if (onMove) {
+      window.removeEventListener('mousemove', onMove);
+      onMove = null;
+    }
+    if (onTouch) {
+      window.removeEventListener('touchmove', onTouch);
+      onTouch = null;
+    }
+    if (onLeave) {
+      window.removeEventListener('mouseleave', onLeave);
+      document.removeEventListener('touchcancel', onLeave);
+      onLeave = null;
+    }
     if (ro) {
       ro.disconnect();
       ro = null;

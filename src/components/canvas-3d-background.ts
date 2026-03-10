@@ -15,6 +15,32 @@ let camera: THREE.PerspectiveCamera;
 let renderer: THREE.WebGLRenderer;
 let meshes: THREE.Mesh[] = [];
 let frameId: number;
+let canvasEl: HTMLCanvasElement | null = null;
+const mouseWorld = { x: 0, y: 0 };
+const mouseTarget = { x: 0, y: 0 };
+let hasMouse = false;
+
+const REPEL_RADIUS = 2.8;
+const REPEL_STRENGTH = 4.7;
+const MOUSE_LERP = 0.14;
+/** Сила поворота букв в сторону курсора (0..1) когда мышь в радиусе */
+const LOOK_AT_STRENGTH = 0.3;
+/** Плавность поворота к курсору (0.1 = медленно, 0.3 = быстрее) — убирает резкие скачки */
+const ROTATION_LERP = 0.11;
+/** Увеличение букв в радиусе: чем дальше от курсора — тем крупнее */
+const SCALE_AMOUNT = 0.14;
+/** Отодвигаемые буквы смещаются вперёд по Z (визуально поверх остальных) */
+const Z_ABOVE = 0.2;
+/** Подъём отодвигаемых букв вверх по Y (чем сильнее отталкивание — тем выше) */
+const Y_RISE = 0.18;
+/** Плавность перехода подъёма/масштаба/Z (0.06 = медленнее, 0.15 = быстрее) */
+const LIFT_LERP = 0.075;
+
+const tempLookAt = new THREE.Object3D();
+const targetQuat = new THREE.Quaternion();
+const restQuat = new THREE.Quaternion();
+const lookAtQuat = new THREE.Quaternion();
+const restEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
 function createMaterial(): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
@@ -27,10 +53,31 @@ function createMaterial(): THREE.MeshPhysicalMaterial {
   });
 }
 
+const vec = new THREE.Vector3();
+const dir = new THREE.Vector3();
+
+export function setMousePosition(clientX: number, clientY: number): void {
+  if (!canvasEl || !camera) return;
+  const rect = canvasEl.getBoundingClientRect();
+  const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+  const ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+  vec.set(ndcX, ndcY, 0.5).unproject(camera);
+  dir.copy(vec).sub(camera.position).normalize();
+  const t = -camera.position.z / dir.z;
+  mouseTarget.x = camera.position.x + t * dir.x;
+  mouseTarget.y = camera.position.y + t * dir.y;
+  hasMouse = true;
+}
+
+export function clearMousePosition(): void {
+  hasMouse = false;
+}
+
 export function initCanvas3D(container: HTMLCanvasElement): void {
   // Перед повторной инициализацией (например после astro:page-load) полностью очищаем предыдущее состояние
   disposeCanvas3D();
 
+  canvasEl = container;
   const width = container.clientWidth;
   const height = container.clientHeight;
 
@@ -66,8 +113,15 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
         geom.center();
         const mesh = new THREE.Mesh(geom, material.clone());
         // Строго по сетке, без случайных смещений — построчное отображение
-        mesh.position.x = col * spacingX - offsetX;
-        mesh.position.y = row * spacingY - offsetY;
+        const baseX = col * spacingX - offsetX;
+        const baseY = row * spacingY - offsetY;
+        mesh.position.x = baseX;
+        mesh.position.y = baseY;
+        mesh.userData.baseX = baseX;
+        mesh.userData.baseY = baseY;
+        mesh.userData.currentZ = 0;
+        mesh.userData.currentYRise = 0;
+        mesh.userData.currentScale = 1;
         mesh.rotation.z = 0;
         mesh.rotation.y = 0;
         scene.add(mesh);
@@ -98,17 +152,80 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
 
   function animate() {
     frameId = requestAnimationFrame(animate);
+    if (hasMouse) {
+      mouseWorld.x += (mouseTarget.x - mouseWorld.x) * MOUSE_LERP;
+      mouseWorld.y += (mouseTarget.y - mouseWorld.y) * MOUSE_LERP;
+    }
     const t = performance.now() * 0.0012;
-    // Анимированный поворот букв — виден объём и глубина (эффект 3D)
     meshes.forEach((m, i) => {
+      const baseX = m.userData.baseX as number;
+      const baseY = m.userData.baseY as number;
+      let dist = 0;
+
+      let targetZ = 0;
+      let targetYRise = 0;
+      let targetScale = 1;
+      let repelY = 0;
+
+      if (hasMouse) {
+        const dx = baseX - mouseWorld.x;
+        const dy = baseY - mouseWorld.y;
+        dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPEL_RADIUS && dist > 0.001) {
+          const falloff = 1 - dist / REPEL_RADIUS;
+          const force = falloff * falloff * REPEL_STRENGTH;
+          const nx = dx / dist;
+          const ny = dy / dist;
+          m.position.x = baseX + nx * force;
+          repelY = ny * force;
+          targetZ = Z_ABOVE;
+          targetYRise = falloff * Y_RISE;
+          targetScale = 1 + (dist / REPEL_RADIUS) * SCALE_AMOUNT;
+        } else {
+          m.position.x = baseX;
+        }
+      } else {
+        m.position.x = baseX;
+      }
+
+      const curZ = (m.userData.currentZ as number) ?? 0;
+      const curYRise = (m.userData.currentYRise as number) ?? 0;
+      const curScale = (m.userData.currentScale as number) ?? 1;
+      m.userData.currentZ = curZ + (targetZ - curZ) * LIFT_LERP;
+      m.userData.currentYRise = curYRise + (targetYRise - curYRise) * LIFT_LERP;
+      m.userData.currentScale = curScale + (targetScale - curScale) * LIFT_LERP;
+
+      m.position.y = baseY + repelY + (m.userData.currentYRise as number);
+      m.position.z = m.userData.currentZ as number;
+      m.scale.setScalar(m.userData.currentScale as number);
+
       const phase = i * 0.18;
-      m.rotation.y = Math.sin(t + phase) * 0.35; // поворот влево-вправо, видна толщина
-      m.rotation.x = Math.sin(t * 0.7 + phase * 1.3) * 0.12; // лёгкий наклон вверх-вниз
-      m.rotation.z = Math.sin(t * 0.5 + phase * 0.8) * 0.08; // лёгкий поворот в плоскости
+      const restY = Math.sin(t + phase) * 0.35;
+      const restX = Math.sin(t * 0.7 + phase * 1.3) * 0.12;
+      const restZ = Math.sin(t * 0.5 + phase * 0.8) * 0.08;
+
+      restEuler.set(restX, restY, restZ, 'YXZ');
+      restQuat.setFromEuler(restEuler);
+
+      if (hasMouse) {
+        if (dist < REPEL_RADIUS && dist > 0.001) {
+          const blend = (1 - dist / REPEL_RADIUS) * LOOK_AT_STRENGTH;
+          tempLookAt.position.set(m.position.x, m.position.y, m.position.z);
+          tempLookAt.lookAt(mouseWorld.x, mouseWorld.y, 0);
+          lookAtQuat.copy(tempLookAt.quaternion);
+          targetQuat.slerpQuaternions(restQuat, lookAtQuat, blend);
+        } else {
+          targetQuat.copy(restQuat);
+        }
+      } else {
+        targetQuat.copy(restQuat);
+      }
+
+      m.quaternion.slerp(targetQuat, ROTATION_LERP);
     });
     renderer.render(scene, camera);
   }
-  animate();
+  frameId = requestAnimationFrame(animate);
 }
 
 export function resizeCanvas3D(container: HTMLCanvasElement): void {
@@ -121,6 +238,8 @@ export function resizeCanvas3D(container: HTMLCanvasElement): void {
 }
 
 export function disposeCanvas3D(): void {
+  canvasEl = null;
+  hasMouse = false;
   if (frameId) {
     cancelAnimationFrame(frameId);
     frameId = 0;
