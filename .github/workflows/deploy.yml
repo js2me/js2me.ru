@@ -65,5 +65,5 @@ jobs:
           # 3. Атомарно переключаем симлинк (пользователи получают новую версию мгновенно)
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "ln -sfn $RELEASE_DIR /var/www/${{ secrets.DOMAIN }}/current"
           
-          # 4. Очистка старых релизов (оставляем последние 5, чтобы не забить диск)
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd /var/www/${{ secrets.DOMAIN }}/releases && ls -1tr | head -n -5 | xargs -d '\n' rm -rf --"
+          # 4. Очистка старых релизов (оставляем последние 10, чтобы не забить диск)
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd /var/www/${{ secrets.DOMAIN }}/releases && ls -1tr | head -n -10 | xargs -d '\n' rm -rf --"
