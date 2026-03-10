@@ -40,6 +40,11 @@ a:hover {
   color: var(--color-link-hover);
 }
 
+main {
+  position: relative;
+  z-index: 1;
+}
+
 .container {
   width: 100%;
   max-width: var(--max-width);
@@ -332,4 +337,13 @@ section h2 {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+/* View Transitions API — плавный переход между страницами */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
 }

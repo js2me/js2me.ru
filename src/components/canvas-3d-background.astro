@@ -1,17 +1,24 @@
----
----
 <div class="canvas-wrapper">
-  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <canvas aria-hidden="true" data-hero-canvas></canvas>
 </div>
 <script>
   import { initCanvas3D, resizeCanvas3D, disposeCanvas3D } from './canvas-3d-background';
 
-  const canvas = document.getElementById('hero-canvas');
-  if (canvas instanceof HTMLCanvasElement) {
+  let ro: ResizeObserver | null = null;
+  let isInitialized = false;
+
+  const setupCanvas = () => {
+    if (isInitialized) return;
+
+    const canvas = document.querySelector('[data-hero-canvas]');
+    if (!(canvas instanceof HTMLCanvasElement)) return;
+
     canvas.classList.add('is-booting');
     initCanvas3D(canvas);
-    const ro = new ResizeObserver(() => resizeCanvas3D(canvas));
+
+    ro = new ResizeObserver(() => resizeCanvas3D(canvas));
     ro.observe(canvas);
+
     // Даём three.js отрисовать первый кадр и плавно показываем canvas.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -19,11 +26,22 @@
         canvas.classList.add('is-ready');
       });
     });
-    window.addEventListener('beforeunload', () => {
+
+    isInitialized = true;
+  };
+
+  const cleanupCanvas = () => {
+    if (!isInitialized) return;
+
+    if (ro) {
       ro.disconnect();
-      disposeCanvas3D();
-    });
-  }
+      ro = null;
+    }
+    disposeCanvas3D();
+    isInitialized = false;
+  };
+
+  setupCanvas();
 </script>
 <style>
   .canvas-wrapper {
@@ -36,7 +54,7 @@
     background-size: cover;
     background-repeat: no-repeat;
   }
-  #hero-canvas {
+  .canvas-wrapper canvas {
     width: 100%;
     height: 100%;
     display: block;
@@ -44,11 +62,11 @@
     transition: opacity 800ms ease;
     will-change: opacity;
   }
-  #hero-canvas.is-ready {
+  .canvas-wrapper canvas.is-ready {
     opacity: 1;
   }
   @media (prefers-reduced-motion: reduce) {
-    #hero-canvas {
+    .canvas-wrapper canvas {
       transition: none;
     }
   }

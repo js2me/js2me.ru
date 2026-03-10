@@ -1,0 +1,108 @@
+---
+---
+<div id="mouse-blur" class="mouse-blur" aria-hidden="true"></div>
+
+<script>
+  let rafId: number | null = null;
+  let onMove: ((e: MouseEvent) => void) | null = null;
+  let onTouch: ((e: TouchEvent) => void) | null = null;
+  let isInitialized = false;
+
+  const setupMouseBlur = () => {
+    if (isInitialized) return;
+
+    const el = document.getElementById('mouse-blur');
+    if (!el) return;
+
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    let targetX = x;
+    let targetY = y;
+
+    const updatePosition = () => {
+      x += (targetX - x) * 0.12;
+      y += (targetY - y) * 0.12;
+      el.style.opacity = '1';
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      rafId = requestAnimationFrame(updatePosition);
+    };
+
+    onMove = (e: MouseEvent) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+    };
+
+    onTouch = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        targetX = e.touches[0].clientX;
+        targetY = e.touches[0].clientY;
+      }
+    };
+
+    rafId = requestAnimationFrame(updatePosition);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('touchmove', onTouch, { passive: true });
+
+    isInitialized = true;
+  };
+
+  const cleanupMouseBlur = () => {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    if (onMove) {
+      window.removeEventListener('mousemove', onMove);
+      onMove = null;
+    }
+    if (onTouch) {
+      window.removeEventListener('touchmove', onTouch);
+      onTouch = null;
+    }
+
+    isInitialized = false;
+  };
+
+  // Первая загрузка (без enhanced navigation)
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupMouseBlur();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupMouseBlur, { once: true });
+  }
+
+  // Поддержка Astro View Transitions / enhanced navigation
+  document.addEventListener('astro:page-load', () => {
+    cleanupMouseBlur();
+    setupMouseBlur();
+  });
+  document.addEventListener('astro:page-unload', () => {
+    cleanupMouseBlur();
+  });
+</script>
+
+<style>
+  .mouse-blur {
+    position: fixed;
+    width: 30vw;
+    height: 30vw;
+    left: 50%;
+    top: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 100%;
+    pointer-events: none;
+    z-index: 0;
+    /* Маска: блюр сильнее в центре, плавно сходит на нет к краям */
+    mask: radial-gradient(circle, black 40%, transparent 70%);
+    -webkit-mask: radial-gradient(circle, black 40%, transparent 70%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mouse-blur {
+      transition: left 0.15s ease-out, top 0.15s ease-out;
+    }
+  }
+</style>

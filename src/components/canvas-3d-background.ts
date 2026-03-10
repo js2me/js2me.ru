@@ -28,6 +28,9 @@ function createMaterial(): THREE.MeshPhysicalMaterial {
 }
 
 export function initCanvas3D(container: HTMLCanvasElement): void {
+  // Перед повторной инициализацией (например после astro:page-load) полностью очищаем предыдущее состояние
+  disposeCanvas3D();
+
   const width = container.clientWidth;
   const height = container.clientHeight;
 
@@ -118,7 +121,10 @@ export function resizeCanvas3D(container: HTMLCanvasElement): void {
 }
 
 export function disposeCanvas3D(): void {
-  if (frameId) cancelAnimationFrame(frameId);
+  if (frameId) {
+    cancelAnimationFrame(frameId);
+    frameId = 0;
+  }
   meshes.forEach((m) => {
     m.geometry.dispose();
     if (Array.isArray(m.material)) m.material.forEach((mat) => mat.dispose());

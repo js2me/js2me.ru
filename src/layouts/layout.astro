@@ -1,4 +1,7 @@
 ---
+import MouseBlur from '../components/mouse-blur.astro';
+import Canvas3DBackground from '../components/canvas-3d-background.astro';
+
 interface Props {
   title: string;
   description?: string;
@@ -60,6 +63,8 @@ const imageURL = imagePath.startsWith('http') ? imagePath : new URL(imagePath, A
     </script>
   </head>
   <body>
+    <Canvas3DBackground />
+    <MouseBlur />
     <slot />
   </body>
 </html>
