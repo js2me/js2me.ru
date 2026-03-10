@@ -1,4 +1,4 @@
-# js2me.ru — персональный сайт и блог
+# js2me.ru
 
 Сайт на [Astro](https://astro.build)
 
