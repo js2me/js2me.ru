@@ -272,6 +272,30 @@ section h2 {
   margin: 0;
 }
 
+/* Карточки внешних ссылок (блог, dev.to и т.д.) */
+.card-external {
+  position: relative;
+  padding-right: 2.5rem;
+}
+.card-external .external-link-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+.card-external:hover .external-link-icon {
+  opacity: 1;
+}
+.card-external-content h3 {
+  margin: 0 0 0.5rem 0;
+  padding-right: 0;
+}
+.card-external-content p {
+  margin: 0;
+}
+
 /* Projects grid: flex, 4 columns */
 .projects-grid {
   display: flex;

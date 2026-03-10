@@ -2,7 +2,9 @@
 import Layout from '../../layouts/layout.astro';
 import SiteHeader from '../../components/site-header.astro';
 import '../../styles/global.css';
+import { allBlogPosts } from '../../data/blog.ts';
 ---
+
 <Layout title="Блог — js2me" description="Блог js2me: статьи о разработке и технологиях.">
   <SiteHeader scrolled />
 
@@ -11,10 +13,28 @@ import '../../styles/global.css';
       <h1 style="margin-bottom: 0.5rem;">Блог</h1>
       <p class="section-intro" style="margin-bottom: 2rem;">Заметки и статьи</p>
       <div class="card-grid">
-        <a href="/blog/hello" class="card">
-          <h3>Первый пост</h3>
-          <p>Приветствие и начало ведения блога на Astro.</p>
-        </a>
+        {
+          allBlogPosts.map((post) =>
+            post.type === 'internal' ? (
+              <a href={post.slug} class="card">
+                <h3>{post.title}</h3>
+                <p>{post.description}</p>
+              </a>
+            ) : (
+              <a href={post.url} class="card card-external" target="_blank" rel="noopener noreferrer">
+                <svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                <div class="card-external-content">
+                  <h3>{post.title}</h3>
+                  <p>{post.description}</p>
+                </div>
+              </a>
+            )
+          )
+        }
       </div>
     </div>
   </main>

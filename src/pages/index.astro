@@ -2,6 +2,9 @@
 import Layout from '../layouts/layout.astro';
 import SiteHeader from '../components/site-header.astro';
 import '../styles/global.css';
+import { getLatestPosts } from '../data/blog.ts';
+
+const latestPosts = getLatestPosts(4);
 ---
 <Layout title="Сергей Волков" description="Это мой персональный сайт, добро пожаловать">
   <SiteHeader />
@@ -216,10 +219,28 @@ import '../styles/global.css';
           Свежие записи из блога.
         </p>
         <div class="card-grid">
-          <a href="/blog/hello" class="card">
-            <h3>Первый пост</h3>
-            <p>Приветствие и начало ведения блога на Astro.</p>
-          </a>
+          {
+            latestPosts.map((post) =>
+              post.type === 'internal' ? (
+                <a href={post.slug} class="card">
+                  <h3>{post.title}</h3>
+                  <p>{post.description}</p>
+                </a>
+              ) : (
+                <a href={post.url} class="card card-external" target="_blank" rel="noopener noreferrer">
+                  <svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  <div class="card-external-content">
+                    <h3>{post.title}</h3>
+                    <p>{post.description}</p>
+                  </div>
+                </a>
+              )
+            )
+          }
         </div>
         <p><a href="/blog">Все посты →</a></p>
       </div>
@@ -232,6 +253,7 @@ import '../styles/global.css';
           <li>Telegram: <a href="https://t.me/js2me" target="_blank" rel="noopener noreferrer">t.me/js2me</a></li>
           <li>Почта: <a href="mailto:js2me@outlook.com">js2me@outlook.com</a></li>
           <li>GitHub: <a href="https://github.com/js2me" target="_blank" rel="noopener noreferrer">github.com/js2me</a></li>
+          <li>DEV: <a href="https://dev.to/js2me" target="_blank" rel="noopener noreferrer">dev.to/js2me</a></li>
           <li>Career Habr: <a href="https://career.habr.com/js2me" target="_blank" rel="noopener noreferrer">career.habr.com/js2me</a></li>
         </ul>
       </div>
