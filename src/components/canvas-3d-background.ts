@@ -19,6 +19,14 @@ let canvasEl: HTMLCanvasElement | null = null;
 const mouseWorld = { x: 0, y: 0 };
 const mouseTarget = { x: 0, y: 0 };
 let hasMouse = false;
+/** Время последнего движения курсора (performance.now()) */
+let lastMouseMoveTime = 0;
+/** Сила эффекта отталкивания (1 = полная, 0 = буквы в покое). Убывает, когда курсор не двигается. */
+let effectStrength = 1;
+const IDLE_THRESHOLD_MS = 0;  // сразу как курсор перестал двигаться — начинаем возвращать буквы
+const IDLE_DECAY_PER_FRAME = 0.0025;  // очень медленное возвращение (0..1 за кадр)
+let lastClientX = -999;
+let lastClientY = -999;
 
 const REPEL_RADIUS = 2.8;
 const REPEL_STRENGTH = 4.7;
@@ -58,6 +66,11 @@ const dir = new THREE.Vector3();
 
 export function setMousePosition(clientX: number, clientY: number): void {
   if (!canvasEl || !camera) return;
+  if (clientX !== lastClientX || clientY !== lastClientY) {
+    lastMouseMoveTime = performance.now();
+    lastClientX = clientX;
+    lastClientY = clientY;
+  }
   const rect = canvasEl.getBoundingClientRect();
   const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
   const ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
@@ -152,11 +165,20 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
 
   function animate() {
     frameId = requestAnimationFrame(animate);
+    const now = performance.now();
     if (hasMouse) {
       mouseWorld.x += (mouseTarget.x - mouseWorld.x) * MOUSE_LERP;
       mouseWorld.y += (mouseTarget.y - mouseWorld.y) * MOUSE_LERP;
+      // Когда курсор не двигается — плавно уменьшаем силу эффекта, буквы возвращаются
+      if (now - lastMouseMoveTime > IDLE_THRESHOLD_MS) {
+        effectStrength = Math.max(0, effectStrength - IDLE_DECAY_PER_FRAME);
+      } else {
+        effectStrength = Math.min(1, effectStrength + 0.08);
+      }
+    } else {
+      effectStrength = Math.max(0, effectStrength - IDLE_DECAY_PER_FRAME);
     }
-    const t = performance.now() * 0.0012;
+    const t = now * 0.0012;
     meshes.forEach((m, i) => {
       const baseX = m.userData.baseX as number;
       const baseY = m.userData.baseY as number;
@@ -173,14 +195,14 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
         dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < REPEL_RADIUS && dist > 0.001) {
           const falloff = 1 - dist / REPEL_RADIUS;
-          const force = falloff * falloff * REPEL_STRENGTH;
+          const force = falloff * falloff * REPEL_STRENGTH * effectStrength;
           const nx = dx / dist;
           const ny = dy / dist;
           m.position.x = baseX + nx * force;
           repelY = ny * force;
-          targetZ = Z_ABOVE;
-          targetYRise = falloff * Y_RISE;
-          targetScale = 1 + (dist / REPEL_RADIUS) * SCALE_AMOUNT;
+          targetZ = Z_ABOVE * effectStrength;
+          targetYRise = falloff * Y_RISE * effectStrength;
+          targetScale = 1 + (dist / REPEL_RADIUS) * SCALE_AMOUNT * effectStrength;
         } else {
           m.position.x = baseX;
         }
@@ -209,7 +231,7 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
 
       if (hasMouse) {
         if (dist < REPEL_RADIUS && dist > 0.001) {
-          const blend = (1 - dist / REPEL_RADIUS) * LOOK_AT_STRENGTH;
+          const blend = (1 - dist / REPEL_RADIUS) * LOOK_AT_STRENGTH * effectStrength;
           tempLookAt.position.set(m.position.x, m.position.y, m.position.z);
           tempLookAt.lookAt(mouseWorld.x, mouseWorld.y, 0);
           lookAtQuat.copy(tempLookAt.quaternion);
