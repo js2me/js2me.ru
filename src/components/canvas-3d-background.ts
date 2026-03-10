@@ -44,6 +44,18 @@ const Y_RISE = 0.18;
 /** Плавность перехода подъёма/масштаба/Z (0.06 = медленнее, 0.15 = быстрее) */
 const LIFT_LERP = 0.075;
 
+/** Наклон букв от скролла: множитель пикселей в радианы */
+const SCROLL_TILT_FACTOR = 0.0018;
+/** Максимальный наклон по X (вниз/вверх) в радианах */
+const SCROLL_TILT_MAX = 0.28;
+/** Затухание цели наклона при отсутствии скролла (к 0) */
+const SCROLL_TILT_DECAY = 0.92;
+/** Плавность применения наклона */
+const SCROLL_TILT_LERP = 0.1;
+
+let scrollTiltTarget = 0;
+let scrollTiltCurrent = 0;
+
 const tempLookAt = new THREE.Object3D();
 const targetQuat = new THREE.Quaternion();
 const restQuat = new THREE.Quaternion();
@@ -84,6 +96,14 @@ export function setMousePosition(clientX: number, clientY: number): void {
 
 export function clearMousePosition(): void {
   hasMouse = false;
+}
+
+/** Обновить наклон букв от скролла: положительный deltaY = скролл вниз = буквы наклоняются вниз */
+export function setScrollDelta(deltaY: number): void {
+  scrollTiltTarget = Math.max(
+    -SCROLL_TILT_MAX,
+    Math.min(SCROLL_TILT_MAX, scrollTiltTarget + deltaY * SCROLL_TILT_FACTOR)
+  );
 }
 
 export function initCanvas3D(container: HTMLCanvasElement): void {
@@ -178,6 +198,11 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
     } else {
       effectStrength = Math.max(0, effectStrength - IDLE_DECAY_PER_FRAME);
     }
+
+    // Наклон от скролла: плавно возвращаемся к 0, когда скролл остановился
+    scrollTiltTarget *= SCROLL_TILT_DECAY;
+    scrollTiltCurrent += (scrollTiltTarget - scrollTiltCurrent) * SCROLL_TILT_LERP;
+
     const t = now * 0.0012;
     meshes.forEach((m, i) => {
       const baseX = m.userData.baseX as number;
@@ -223,7 +248,7 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
 
       const phase = i * 0.18;
       const restY = Math.sin(t + phase) * 0.35;
-      const restX = Math.sin(t * 0.7 + phase * 1.3) * 0.12;
+      const restX = Math.sin(t * 0.7 + phase * 1.3) * 0.12 + scrollTiltCurrent;
       const restZ = Math.sin(t * 0.5 + phase * 0.8) * 0.08;
 
       restEuler.set(restX, restY, restZ, 'YXZ');
@@ -262,6 +287,8 @@ export function resizeCanvas3D(container: HTMLCanvasElement): void {
 export function disposeCanvas3D(): void {
   canvasEl = null;
   hasMouse = false;
+  scrollTiltTarget = 0;
+  scrollTiltCurrent = 0;
   if (frameId) {
     cancelAnimationFrame(frameId);
     frameId = 0;

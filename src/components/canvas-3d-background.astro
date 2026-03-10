@@ -2,13 +2,15 @@
   <canvas aria-hidden="true" data-hero-canvas></canvas>
 </div>
 <script>
-  import { initCanvas3D, resizeCanvas3D, disposeCanvas3D, setMousePosition, clearMousePosition } from './canvas-3d-background';
+  import { initCanvas3D, resizeCanvas3D, disposeCanvas3D, setMousePosition, clearMousePosition, setScrollDelta } from './canvas-3d-background';
 
   let ro: ResizeObserver | null = null;
   let isInitialized = false;
   let onMove: ((e: MouseEvent) => void) | null = null;
   let onTouch: ((e: TouchEvent) => void) | null = null;
   let onLeave: (() => void) | null = null;
+  let onScroll: (() => void) | null = null;
+  let lastScrollY = 0;
 
   const setupCanvas = () => {
     if (isInitialized) return;
@@ -29,6 +31,14 @@
     window.addEventListener('touchmove', onTouch, { passive: true });
     window.addEventListener('mouseleave', onLeave);
     document.addEventListener('touchcancel', onLeave);
+
+    lastScrollY = window.scrollY;
+    onScroll = () => {
+      const y = window.scrollY;
+      setScrollDelta(y - lastScrollY);
+      lastScrollY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     ro = new ResizeObserver(() => resizeCanvas3D(canvas));
     ro.observe(canvas);
@@ -58,6 +68,10 @@
       window.removeEventListener('mouseleave', onLeave);
       document.removeEventListener('touchcancel', onLeave);
       onLeave = null;
+    }
+    if (onScroll) {
+      window.removeEventListener('scroll', onScroll);
+      onScroll = null;
     }
     if (ro) {
       ro.disconnect();
