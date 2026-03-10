@@ -15,8 +15,8 @@ interface Props {
 const { title, description = 'Персональный сайт и блог js2me', ogImage, ogType = 'website', noIndex = false } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-// Превью по умолчанию: положите в public/og-default.png (1200×630 px)
-const imagePath = ogImage ?? '/og-default.png';
+// Превью по умолчанию: me.jpg (для кастомного 1200×630 можно передать ogImage)
+const imagePath = ogImage ?? '/me.jpg';
 const imageURL = imagePath.startsWith('http') ? imagePath : new URL(imagePath, Astro.site).href;
 ---
 <!doctype html>
