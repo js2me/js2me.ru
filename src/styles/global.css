@@ -151,8 +151,19 @@ main {
 .nav-cv-btn:active {
   transform: translateY(0);
 }
+.header-cv-btn {
+  display: none;
+}
 
 @media (max-width: 767px) {
+  .header-cv-btn {
+    display: inline-flex;
+    margin-right: 2rem;
+    margin-left: auto;
+  }
+  .nav-cv-li {
+    display: none;
+  }
   .burger-btn {
     display: flex;
     position: relative;
