@@ -37,6 +37,15 @@ const imageURL = imagePath.startsWith('http') ? imagePath : new URL(imagePath, A
     <link rel="apple-touch-icon" href="/me-small.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="фронтенд, frontend, JavaScript, TypeScript, React, MobX, Effector, Redux, веб-разработка, разработка интерфейсов, архитектура фронтенда, веб-производительность, UI, UX, карьера разработчика, опыт разработки, блог о фронтенде, IT, программирование, Astro"
+    />
+    <meta name="author" content="js2me" />
+    <meta name="application-name" content="js2me — блог о фронтенде и веб‑разработке" />
+    <meta name="subject" content="Блог о фронтенд‑разработке, JavaScript и веб‑технологиях" />
+    <meta name="category" content="IT, фронтенд‑разработка, веб‑разработка" />
+    <meta name="theme-color" content="#020817" />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL.href} />
@@ -57,6 +66,42 @@ const imageURL = imagePath.startsWith('http') ? imagePath : new URL(imagePath, A
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageURL} />
+
+    <script type="application/ld+json" is:inline>
+      {JSON.stringify(
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'js2me',
+          url: canonicalURL.origin,
+          inLanguage: 'ru-RU',
+          description,
+          about: [
+            'фронтенд-разработка',
+            'JavaScript',
+            'TypeScript',
+            'React',
+            'MobX',
+            'Effector',
+            'Redux',
+            'веб-разработка',
+            'архитектура фронтенда',
+            'производительность веб-приложений',
+            'best practices фронтенда',
+            'Astro'
+          ],
+          creator: {
+            '@type': 'Person',
+            name: 'js2me',
+            jobTitle: 'Frontend Engineer',
+            description:
+              'Фронтенд‑разработчик, делюсь опытом из мира JavaScript, TypeScript, React и современной веб‑разработки.'
+          }
+        },
+        null,
+        2
+      )}
+    </script>
 
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
