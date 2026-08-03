@@ -24,6 +24,7 @@ const internalPosts: InternalPost[] = [
 ];
 
 const devToArticles: ExternalPost[] = [
+  { type: 'external', title: 'MobX или приправа реактивности для JS', url: 'https://habr.com/ru/articles/1043240/', description: 'MobX как стейт-менеджер: плюсы, сравнение с Redux/Zustand/Effector и недостатки.' },
   { type: 'external', title: 'Simple reactivity in React with MobX', url: 'https://dev.to/js2me/simple-reactivity-in-react-with-mobx-17ga', description: 'Удобная реактивность в React с MobX.' },
   { type: 'external', title: 'Diving into MobX', url: 'https://dev.to/js2me/diving-into-mobx-35h2', description: 'Погружение в MobX и его философию.' },
   { type: 'external', title: 'Why Swagger schemes are needed in frontend development?', url: 'https://dev.to/js2me/why-swagger-schemes-are-needed-in-frontend-development-2cb4', description: 'Зачем фронтенду схемы Swagger и генерация API.' },
