@@ -16,6 +16,8 @@ let renderer: THREE.WebGLRenderer;
 let meshes: THREE.Mesh[] = [];
 let frameId: number;
 let canvasEl: HTMLCanvasElement | null = null;
+/** Уважаем системную настройку «уменьшить анимацию»: сцена рисуется статично, без движения */
+let reducedMotion = false;
 const mouseWorld = { x: 0, y: 0 };
 const mouseTarget = { x: 0, y: 0 };
 let hasMouse = false;
@@ -111,6 +113,7 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
   disposeCanvas3D();
 
   canvasEl = container;
+  reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const width = container.clientWidth;
   const height = container.clientHeight;
 
@@ -177,6 +180,11 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
     const rim = new THREE.DirectionalLight(REFLECT_TINT, 0.28); // блики по краям
     rim.position.set(2, 1, 2);
     scene.add(rim);
+
+    // При «уменьшить анимацию» сцена статична: рисуем один кадр, rAF-цикл не запускаем
+    if (reducedMotion && renderer) {
+      renderer.render(scene, camera);
+    }
   });
 
   renderer = new THREE.WebGLRenderer({ canvas: container, alpha: false, antialias: true });
@@ -272,7 +280,10 @@ export function initCanvas3D(container: HTMLCanvasElement): void {
     });
     renderer.render(scene, camera);
   }
-  frameId = requestAnimationFrame(animate);
+  // Без анимации (reduced motion) цикл не запускаем — статичный кадр уже отрисован в загрузчике шрифта
+  if (!reducedMotion) {
+    frameId = requestAnimationFrame(animate);
+  }
 }
 
 export function resizeCanvas3D(container: HTMLCanvasElement): void {
@@ -282,6 +293,10 @@ export function resizeCanvas3D(container: HTMLCanvasElement): void {
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
+  // Для статичной сцены (reduced motion) перерисовываем вручную — rAF-цикл не запущен
+  if (reducedMotion) {
+    renderer.render(scene, camera);
+  }
 }
 
 export function disposeCanvas3D(): void {
